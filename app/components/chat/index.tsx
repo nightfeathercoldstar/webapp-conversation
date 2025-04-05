@@ -118,9 +118,9 @@ const Chat: FC<IChatProps> = ({
   }
 
   return (
-    <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full')}>
+    <div className="h-full flex flex-col">
       {/* Chat List */}
-      <div className="h-full space-y-[30px]">
+      <div className={cn(s.messageContainer, "overflow-y-auto flex-1")}>
         {chatList.map((item) => {
           if (item.isAnswer) {
             const isLast = item.id === chatList[chatList.length - 1].id
@@ -145,20 +145,19 @@ const Chat: FC<IChatProps> = ({
       </div>
       {
         !isHideSendInput && (
-          <div className={cn(!feedbackDisabled && '!left-3.5 !right-3.5', 'absolute z-10 bottom-0 left-0 right-0')}>
-            <div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
+          <div className={cn(s.inputContainer, "border-t border-gray-200 bg-white py-4")}>
+            <div className="relative rounded-lg shadow-sm">
               {
                 visionConfig?.enabled && (
                   <>
-                    <div className='absolute bottom-2 left-2 flex items-center'>
+                    <div className='absolute bottom-3 left-3 flex items-center z-10'>
                       <ChatImageUploader
                         settings={visionConfig}
                         onUpload={onUpload}
                         disabled={files.length >= visionConfig.number_limits}
                       />
-                      <div className='mx-1 w-[1px] h-4 bg-black/5' />
                     </div>
-                    <div className='pl-[52px]'>
+                    <div className='pl-[52px] mb-2'>
                       <ImageList
                         list={files}
                         onRemove={onRemove}
@@ -171,18 +170,20 @@ const Chat: FC<IChatProps> = ({
                 )
               }
               <Textarea
-                className={`
-                  block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
-                  ${visionConfig?.enabled && 'pl-12'}
-                `}
+                className={cn(
+                  s.textArea,
+                  "w-full outline-none",
+                  visionConfig?.enabled && 'pl-12'
+                )}
                 value={query}
                 onChange={handleContentChange}
                 onKeyUp={handleKeyUp}
                 onKeyDown={handleKeyDown}
-                autoSize
+                autoSize={{ minRows: 1, maxRows: 8 }}
+                placeholder="发送消息..."
               />
-              <div className="absolute bottom-2 right-2 flex items-center h-8">
-                <div className={`${s.count} mr-4 h-5 leading-5 text-sm bg-gray-50 text-gray-500`}>{query.trim().length}</div>
+              <div className="absolute bottom-2.5 right-2.5 flex items-center">
+                <div className={`${s.count} mr-2`}>{query.trim().length > 0 ? query.trim().length : ''}</div>
                 <Tooltip
                   selector='send-tip'
                   htmlContent={
@@ -192,9 +193,18 @@ const Chat: FC<IChatProps> = ({
                     </div>
                   }
                 >
-                  <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
+                  <div
+                    className={`${s.sendBtn} w-9 h-9 flex items-center justify-center cursor-pointer ${query.trim().length > 0 ? 'bg-blue-600 text-white' : ''}`}
+                    onClick={handleSend}
+                  ></div>
                 </Tooltip>
               </div>
+            </div>
+            <div className="text-center text-xs text-gray-400 mt-2">
+              Text-to-SQL 助手由先进AI技术驱动
+            </div>
+            <div className="text-center text-xs text-gray-400 mt-1">
+              支持长文本输入，可使用Shift+Enter换行
             </div>
           </div>
         )
